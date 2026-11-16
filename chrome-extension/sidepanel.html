@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Darija Translator</title>
+  <link rel="stylesheet" href="sidepanel.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo">د</span>
+      <div>
+        <h1>Darija Translator</h1>
+        <p class="sub">Any language → الدارجة المغربية</p>
+      </div>
+    </div>
+    <span id="status" class="status" title="Server status">●</span>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="row between">
+        <label for="sourceLang">From</label>
+        <select id="sourceLang">
+          <option value="auto">Detect language</option>
+          <option value="English" data-speech="en-US">English</option>
+          <option value="French" data-speech="fr-FR">French</option>
+          <option value="Spanish" data-speech="es-ES">Spanish</option>
+          <option value="Modern Standard Arabic" data-speech="ar-SA">Standard Arabic</option>
+          <option value="German" data-speech="de-DE">German</option>
+        </select>
+      </div>
+      <textarea id="input" rows="6" placeholder="Select text on a page → right-click → Translate to Darija, or type / speak here…"></textarea>
+      <div class="row between">
+        <div class="row">
+          <button id="micBtn" class="icon" title="Speak (speech to text)">🎤</button>
+          <button id="speakSourceBtn" class="icon" title="Read source aloud">🔊</button>
+          <button id="pageSelBtn" class="icon" title="Use text selected on the page">⤵️</button>
+          <button id="clearBtn" class="icon" title="Clear">✕</button>
+        </div>
+        <span id="charCount" class="muted">0</span>
+      </div>
+    </section>
+
+    <section class="row between controls">
+      <div class="segmented" role="radiogroup" aria-label="Darija script">
+        <button data-script="arabic" class="seg active">عربية</button>
+        <button data-script="latin" class="seg">3arabizi</button>
+      </div>
+      <button id="translateBtn" class="primary">Translate</button>
+    </section>
+
+    <section class="card result">
+      <div class="row between">
+        <span class="label">Darija</span>
+        <div class="row">
+          <button id="speakBtn" class="icon" title="Read aloud" disabled>🔊</button>
+          <button id="copyBtn" class="icon" title="Copy" disabled>📋</button>
+        </div>
+      </div>
+      <div id="output" class="output" dir="auto" aria-live="polite"></div>
+      <div id="meta" class="muted small"></div>
+    </section>
+
+    <div id="message" class="message hidden"></div>
+
+    <section class="card">
+      <label class="check"><input type="checkbox" id="voiceMode" /> Voice-to-voice mode <span class="muted">(speak → translate → read aloud)</span></label>
+      <label class="check"><input type="checkbox" id="autoTranslate" checked /> Translate right-clicked text automatically</label>
+      <label class="check"><input type="checkbox" id="autoCopy" /> Copy each translation to clipboard</label>
+    </section>
+
+    <details class="card">
+      <summary>History</summary>
+      <ul id="history" class="history"></ul>
+      <button id="clearHistoryBtn" class="link">Clear history</button>
+    </details>
+
+    <details class="card" id="settingsBox">
+      <summary>Server settings</summary>
+      <label>API base URL <input id="serverUrl" type="url" placeholder="http://localhost:8080/translator/api" /></label>
+      <label>Username <input id="username" type="text" autocomplete="username" /></label>
+      <label>Password <input id="password" type="password" autocomplete="current-password" /></label>
+      <div class="row">
+        <button id="saveSettingsBtn" class="primary small-btn">Save</button>
+        <button id="testBtn" class="small-btn">Test connection</button>
+      </div>
+    </details>
+  </main>
+
+  <script src="api.js"></script>
+  <script src="sidepanel.js"></script>
+</body>
+</html>

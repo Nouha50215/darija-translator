@@ -1,0 +1,131 @@
+:root {
+  --red: #c1272d;
+  --green: #006233;
+  --bg: #f7f5f2;
+  --card: #ffffff;
+  --text: #1f1f1f;
+  --muted: #6b6b6b;
+  --border: #e3ded7;
+  --radius: 10px;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1b1a19;
+    --card: #262523;
+    --text: #f1efec;
+    --muted: #a19d97;
+    --border: #3a3835;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--red);
+  color: #fff;
+}
+
+.brand { display: flex; align-items: center; gap: 10px; }
+.logo {
+  width: 34px; height: 34px; border-radius: 8px;
+  display: grid; place-items: center;
+  background: var(--green); font-size: 20px; font-weight: 700;
+}
+h1 { margin: 0; font-size: 16px; }
+.sub { margin: 0; font-size: 12px; opacity: 0.9; }
+
+.status { font-size: 14px; color: #f3c623; }
+.status.up { color: #6ee7a0; }
+.status.down { color: #ffb4b4; }
+
+main { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row { display: flex; align-items: center; gap: 6px; }
+.between { justify-content: space-between; }
+
+textarea, input[type="text"], input[type="url"], input[type="password"], select {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+}
+select { width: auto; }
+textarea { resize: vertical; min-height: 90px; }
+textarea:focus, input:focus, select:focus { outline: 2px solid var(--green); outline-offset: -1px; }
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: inherit;
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+button:disabled { opacity: 0.45; cursor: default; }
+button.icon { padding: 4px 8px; font-size: 15px; }
+button.primary { background: var(--green); color: #fff; border-color: var(--green); font-weight: 600; padding: 8px 18px; }
+button.primary:disabled { opacity: 0.7; }
+button.link { border: 0; background: none; color: var(--muted); text-decoration: underline; align-self: flex-start; padding: 0; }
+.small-btn { padding: 6px 12px !important; }
+
+button.recording { background: var(--red); color: #fff; animation: pulse 1s infinite; }
+@keyframes pulse { 50% { opacity: 0.6; } }
+
+.segmented { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.seg { border: 0; border-radius: 0; padding: 7px 12px; }
+.seg.active { background: var(--red); color: #fff; }
+
+.label { font-weight: 600; color: var(--green); }
+.output {
+  min-height: 70px;
+  font-size: 18px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  font-family: "Noto Naskh Arabic", "Noto Sans Arabic", system-ui, sans-serif;
+}
+.output.loading { opacity: 0.4; }
+
+.muted { color: var(--muted); }
+.small { font-size: 11px; }
+
+.message { padding: 8px 10px; border-radius: 8px; font-size: 13px; }
+.message.hidden { display: none; }
+.message.error { background: #fde8e8; color: #8a1c1c; }
+.message.info { background: #e8f0fd; color: #1c3f8a; }
+.message.success { background: #e5f6ec; color: #135c32; }
+
+.check { display: flex; gap: 6px; align-items: baseline; font-size: 13px; }
+summary { cursor: pointer; font-weight: 600; }
+details label { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--muted); }
+
+.history { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow: auto; }
+.history li { border-bottom: 1px dashed var(--border); padding: 4px 0; cursor: pointer; }
+.h-src { font-size: 12px; color: var(--muted); }
+.h-dst { font-size: 15px; }
