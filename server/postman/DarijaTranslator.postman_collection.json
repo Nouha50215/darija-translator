@@ -1,0 +1,93 @@
+{
+  "info": {
+    "name": "Darija Translator API",
+    "description": "Tests for the LLM-powered Darija translation REST service. Set the collection variables baseUrl, username and password.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "basic",
+    "basic": [
+      { "key": "username", "value": "{{username}}", "type": "string" },
+      { "key": "password", "value": "{{password}}", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/translator/api" },
+    { "key": "username", "value": "student" },
+    { "key": "password", "value": "darija2026" }
+  ],
+  "item": [
+    {
+      "name": "Health (public)",
+      "request": {
+        "auth": { "type": "noauth" },
+        "method": "GET",
+        "url": "{{baseUrl}}/health"
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('200 UP', () => { pm.response.to.have.status(200); pm.expect(pm.response.json().status).to.eql('UP'); });"
+      ]}}]
+    },
+    {
+      "name": "Translate POST (Arabic script)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"text\": \"Good morning, how are you today?\",\n  \"sourceLanguage\": \"English\",\n  \"script\": \"arabic\"\n}" },
+        "url": "{{baseUrl}}/translate"
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('200 with translation', () => { pm.response.to.have.status(200); pm.expect(pm.response.json().translation).to.be.a('string').and.not.empty; });"
+      ]}}]
+    },
+    {
+      "name": "Translate POST (Latin / Arabizi)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"text\": \"I want to go to the beach tomorrow with my friends.\",\n  \"script\": \"latin\"\n}" },
+        "url": "{{baseUrl}}/translate"
+      }
+    },
+    {
+      "name": "Translate GET (French source)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/translate?text=Je%20suis%20tr%C3%A8s%20fatigu%C3%A9&sourceLanguage=French",
+          "host": ["{{baseUrl}}"],
+          "path": ["translate"],
+          "query": [
+            { "key": "text", "value": "Je%20suis%20tr%C3%A8s%20fatigu%C3%A9" },
+            { "key": "sourceLanguage", "value": "French" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "No credentials -> 401",
+      "request": {
+        "auth": { "type": "noauth" },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\"text\":\"Hello\"}" },
+        "url": "{{baseUrl}}/translate"
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('401', () => pm.response.to.have.status(401));"
+      ]}}]
+    },
+    {
+      "name": "Empty text -> 400",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\"text\":\"\"}" },
+        "url": "{{baseUrl}}/translate"
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('400', () => pm.response.to.have.status(400));"
+      ]}}]
+    }
+  ]
+}
