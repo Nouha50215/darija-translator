@@ -1,0 +1,138 @@
+---
+title: Darija Translator - Class Diagram (server)
+---
+classDiagram
+    direction LR
+
+    namespace rest {
+        class TranslatorApplication {
+            <<ApplicationPath /api>>
+        }
+        class TranslatorResource {
+            <<Path /translate>>
+            -TranslationService translationService
+            -SecurityContext securityContext
+            +translate(TranslationRequest) TranslationResponse
+            +translate(text, sourceLanguage, script) TranslationResponse
+        }
+        class HealthResource {
+            <<Path /health>>
+            +health() Map
+        }
+        class CorsFilter {
+            <<Provider>>
+            +filter(req, res) void
+        }
+        class ErrorMappers {
+            <<Provider x5>>
+            InvalidRequestMapper 400
+            MalformedJsonMapper 400
+            ProcessingMapper 400
+            LlmMapper 502
+            WebAppMapper
+        }
+    }
+
+    namespace service {
+        class TranslationService {
+            <<ApplicationScoped>>
+            -LlmClient llm
+            -int maxTextLength
+            -Map cache
+            +translate(TranslationRequest) TranslationResponse
+            ~buildSystemInstruction(source, script)$ String
+            ~cleanOutput(raw)$ String
+        }
+        class InvalidTranslationRequestException
+    }
+
+    namespace llm {
+        class LlmClient {
+            <<interface>>
+            +complete(systemInstruction, userMessage) String
+            +provider() String
+            +model() String
+        }
+        class GeminiClient {
+            -String apiKey
+            -String model
+            -HttpClient http
+            ~parseResponse(status, body)$ String
+        }
+        class OllamaClient {
+            -String baseUrl
+            -String model
+            -HttpClient http
+        }
+        class LlmClientFactory {
+            +create(AppConfig)$ LlmClient
+        }
+        class LlmException
+    }
+
+    namespace security {
+        class SecurityConfig {
+            <<BasicAuthenticationMechanismDefinition>>
+            +String ROLE_TRANSLATOR$
+        }
+        class TranslatorIdentityStore {
+            <<ApplicationScoped>>
+            -Map users
+            +validate(Credential) CredentialValidationResult
+        }
+        class IdentityStore {
+            <<interface Jakarta Security>>
+        }
+    }
+
+    namespace model {
+        class TranslationRequest {
+            -String text
+            -String sourceLanguage
+            -String script
+        }
+        class TranslationResponse {
+            -String originalText
+            -String translation
+            -String sourceLanguage
+            -String targetLanguage
+            -String script
+            -String provider
+            -String model
+            -boolean cached
+            -long durationMs
+        }
+        class ErrorResponse {
+            -int status
+            -String error
+            -String message
+        }
+    }
+
+    class AppConfig {
+        <<ApplicationScoped>>
+        +llmProvider() String
+        +geminiApiKey() String
+        +users() Map
+        +maxTextLength() int
+    }
+
+    TranslatorResource --> TranslationService : injects
+    HealthResource --> TranslationService : injects
+    TranslatorResource ..> TranslationRequest : consumes
+    TranslatorResource ..> TranslationResponse : produces
+    TranslationService --> LlmClient : uses
+    TranslationService ..> LlmClientFactory : creates via
+    TranslationService --> AppConfig : injects
+    LlmClientFactory ..> GeminiClient : creates
+    LlmClientFactory ..> OllamaClient : creates
+    LlmClient <|.. GeminiClient
+    LlmClient <|.. OllamaClient
+    GeminiClient ..> LlmException : throws
+    OllamaClient ..> LlmException : throws
+    TranslationService ..> InvalidTranslationRequestException : throws
+    ErrorMappers ..> ErrorResponse : builds
+    ErrorMappers ..> LlmException : maps
+    IdentityStore <|.. TranslatorIdentityStore
+    TranslatorIdentityStore --> AppConfig : injects
+    SecurityConfig ..> TranslatorIdentityStore : validates with

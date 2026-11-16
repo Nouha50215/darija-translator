@@ -1,0 +1,36 @@
+// UML use case diagram (Graphviz). Render: dot -Tpng use-case-diagram.dot -o use-case-diagram.png
+digraph UseCases {
+    graph [rankdir=LR, fontname="Helvetica", fontsize=18, labelloc=t, nodesep=0.35, ranksep=1.2, pad=0.4,
+           label="Darija Translator - Use Case Diagram\n "];
+    node  [fontname="Helvetica", fontsize=11];
+    edge  [fontname="Helvetica", fontsize=9, arrowhead=none, color="#444444"];
+
+    user  [label=<&lt;&lt;actor&gt;&gt;<br/><b>User</b>>, shape=box, style="rounded,filled", fillcolor="#fff3e0", color="#6b4f3a"];
+    llm   [label=<&lt;&lt;actor&gt;&gt;<br/><b>LLM</b><br/>(Gemini / Ollama)>, shape=box, style="rounded,filled", fillcolor="#eef3fd", color="#1c3f8a"];
+
+    subgraph cluster_system {
+        label="Darija Translator system"; style=rounded; color="#c1272d"; fontsize=13;
+        node [shape=ellipse, style=filled, fillcolor="#fdfaf6", color="#6b4f3a"];
+        uc1 [label="Translate text\nto Darija"];
+        uc2 [label="Translate selected\nweb text (side panel)"];
+        uc3 [label="Choose script\n(Arabic / 3arabizi)"];
+        uc4 [label="Speak input\n(speech-to-text)"];
+        uc5 [label="Read translation aloud\n(text-to-speech)"];
+        uc6 [label="Voice-to-voice\ntranslation"];
+        uc7 [label="Authenticate\n(HTTP Basic)"];
+        uc8 [label="Configure server\n& credentials"];
+        uc9 [label="View / reuse\nhistory"];
+        uc10 [label="Copy / share\ntranslation"];
+    }
+
+    user -> uc1; user -> uc2; user -> uc4; user -> uc5; user -> uc6; user -> uc8; user -> uc9; user -> uc10;
+    uc1 -> llm;
+
+    edge [style=dashed, arrowhead=vee, fontcolor="#555555"];
+    uc1 -> uc7 [label="«include»"];
+    uc2 -> uc1 [label="«include»"];
+    uc6 -> uc4 [label="«include»"];
+    uc6 -> uc1 [label="«include»"];
+    uc6 -> uc5 [label="«include»"];
+    uc3 -> uc1 [label="«extend»"];
+}

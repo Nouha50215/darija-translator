@@ -1,0 +1,31 @@
+// UML deployment diagram (Graphviz). Render: dot -Tpng deployment-diagram.dot -o deployment-diagram.png
+digraph Deployment {
+    graph [rankdir=LR, fontname="Helvetica", fontsize=18, labelloc=t, nodesep=0.5, ranksep=1.3, pad=0.4,
+           label="Darija Translator - Deployment Diagram\n "];
+    node  [fontname="Helvetica", fontsize=11, shape=box3d, style=filled, fillcolor="#fdfaf6", color="#6b4f3a"];
+    edge  [fontname="Helvetica", fontsize=10, color="#444444"];
+
+    subgraph cluster_clients {
+        label="Client devices"; fontsize=13; style="rounded,dashed"; color="#999999";
+
+        browser [label=<<b>&lt;&lt;device&gt;&gt;<br/>User PC</b><br/><br/>&lt;&lt;execution environment&gt;&gt;<br/>Google Chrome<br/><br/>&lt;&lt;artifact&gt;&gt; Chrome extension (MV3)<br/>background.js · sidepanel.html/js · api.js>];
+        phpnode [label=<<b>&lt;&lt;device&gt;&gt;<br/>Web host / PC</b><br/><br/>&lt;&lt;execution environment&gt;&gt;<br/>PHP 8 (built-in server / Apache)<br/><br/>&lt;&lt;artifact&gt;&gt; index.php · cli.php · DarijaClient.php>];
+        pynode  [label=<<b>&lt;&lt;device&gt;&gt;<br/>User PC</b><br/><br/>&lt;&lt;execution environment&gt;&gt;<br/>Python 3<br/><br/>&lt;&lt;artifact&gt;&gt; darija_client.py · gui.py>];
+        mobile  [label=<<b>&lt;&lt;device&gt;&gt;<br/>Android / iOS phone</b><br/><br/>&lt;&lt;execution environment&gt;&gt;<br/>React Native (Expo)<br/><br/>&lt;&lt;artifact&gt;&gt; App.js · src/api.js>];
+    }
+
+    server [label=<<b>&lt;&lt;device&gt;&gt;<br/>Application server</b><br/><br/>&lt;&lt;execution environment&gt;&gt;<br/>JVM 17+ · Payara Micro 6 (Jakarta EE 10)<br/><br/>&lt;&lt;artifact&gt;&gt; translator.war<br/>TranslatorResource · TranslationService<br/>Jakarta Security (Basic auth) · LlmClient>, fillcolor="#eef7f1", color="#006233"];
+
+    subgraph cluster_llm {
+        label="LLM providers (one is active)"; fontsize=13; style="rounded,dashed"; color="#999999";
+        gemini [label=<<b>&lt;&lt;external system&gt;&gt;<br/>Google Cloud</b><br/><br/>Gemini API<br/>generativelanguage.googleapis.com>, fillcolor="#eef3fd", color="#1c3f8a"];
+        ollama [label=<<b>&lt;&lt;device&gt;&gt;<br/>Local machine</b><br/><br/>&lt;&lt;execution environment&gt;&gt; Ollama<br/>&lt;&lt;artifact&gt;&gt; qwen2.5:3b (lightweight LLM)>, fillcolor="#eef3fd", color="#1c3f8a"];
+    }
+
+    browser -> server [label="HTTP/JSON\nBasic auth\nPOST /api/translate"];
+    phpnode -> server [label="HTTP/JSON (cURL)\nBasic auth"];
+    pynode  -> server [label="HTTP/JSON (urllib)\nBasic auth"];
+    mobile  -> server [label="HTTP/JSON (fetch)\nBasic auth"];
+    server  -> gemini [label="HTTPS/JSON\nx-goog-api-key"];
+    server  -> ollama [label="HTTP/JSON\n:11434 /api/chat", style=dashed];
+}

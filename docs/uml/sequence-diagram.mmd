@@ -1,0 +1,41 @@
+---
+title: Translate selected text from the Chrome extension
+---
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant P as Web page
+    participant BG as Extension service worker
+    participant SP as Side panel
+    participant SEC as Jakarta Security (Basic mechanism + IdentityStore)
+    participant R as TranslatorResource
+    participant S as TranslationService
+    participant L as LlmClient (Gemini / Ollama)
+
+    U->>P: select text, right-click
+    U->>BG: "Translate to Darija" (context menu)
+    BG->>SP: chrome.sidePanel.open()
+    BG->>P: scripting.executeScript(getSelection)
+    P-->>BG: selected text
+    BG->>SP: storage.session.set(pendingText)
+    SP->>SP: paste text into input
+    SP->>SEC: POST /api/translate + Authorization: Basic
+    alt invalid credentials
+        SEC-->>SP: 401 Unauthorized
+        SP-->>U: show "wrong username or password"
+    else valid user in role translator
+        SEC->>R: forward request
+        R->>S: translate(request)
+        alt cached
+            S-->>R: cached translation
+        else not cached
+            S->>L: complete(systemPrompt, text)
+            L-->>S: Darija text
+            S->>S: cleanOutput() + cache
+        end
+        R-->>SP: 200 JSON {translation, script, model...}
+        SP-->>U: show translation (RTL)
+        opt read aloud / voice mode
+            SP->>SP: speechSynthesis.speak(ar-MA)
+        end
+    end
